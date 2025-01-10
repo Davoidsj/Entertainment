@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -29,6 +30,15 @@ func main() {
 	defer conn.Close(context.Background())
 
 	r := gin.Default()
+
+	// Enable CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://yourfrontend.com"}, // Add allowed origins
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 
 	// Serve static files (like index.js)
 	r.Static("/static", "./static")
@@ -65,7 +75,7 @@ func main() {
 
 	// Handle GET request to fetch video data
 	r.GET("/videos", func(c *gin.Context) {
-		rows, err := conn.Query(context.Background(), "SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db")
+		rows, err := conn.Query(context.Background(), "SELECT id, name, description, thumbnail, videolink, category FROM movie_and_webseries_db")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query database"})
 			return
