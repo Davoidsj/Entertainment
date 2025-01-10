@@ -31,11 +31,11 @@ func main() {
 
 	r := gin.Default()
 
-	// Enable CORS
+	// Enable CORS for all origins
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "https://yourfrontend.com"}, // Add allowed origins
+		AllowOrigins:     []string{"*"}, // Allow all origins
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
@@ -58,7 +58,7 @@ func main() {
 
 		// Insert data into PostgreSQL
 		_, err := conn.Exec(context.Background(),
-			"INSERT INTO movie_and_webseries_db (id, name, description, thumbnail, videolink, category) VALUES ($1, $2, $3, $4, $5, $6)",
+			"INSERT INTO entertainment_db (id, name, description, thumbnail, videolink, category) VALUES ($1, $2, $3, $4, $5, $6)",
 			videoID, videoData.Title, videoData.Description, videoData.Thumbnail, videoData.Video, videoData.Category)
 		if err != nil {
 			log.Printf("Database insertion failed: %v", err)
@@ -75,7 +75,7 @@ func main() {
 
 	// Handle GET request to fetch video data
 	r.GET("/videos", func(c *gin.Context) {
-		rows, err := conn.Query(context.Background(), "SELECT id, name, description, thumbnail, videolink, category FROM movie_and_webseries_db")
+		rows, err := conn.Query(context.Background(), "SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query database"})
 			return
