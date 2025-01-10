@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Video</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-center mb-4">Upload Video</h2>
+    <form id="uploadForm" class="space-y-4">
+      <div>
+        <label for="title" class="block text-sm font-medium text-gray-700">Video Title</label>
+        <input type="text" id="title" name="title" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required />
+      </div>
+
+      <div>
+        <label for="thumbnail" class="block text-sm font-medium text-gray-700">Video Thumbnail</label>
+        <input type="text" id="thumbnail" name="thumbnail" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required />
+      </div>
+
+      <div>
+        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+        <textarea id="description" name="description" rows="4" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required></textarea>
+      </div>
+
+      <div>
+        <label for="category" class="block text-sm font-medium text-gray-700">Video Category</label>
+        <select id="category" name="category" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+          <option value="">Select Category</option>
+          <option value="Movies">Movies</option>
+          <option value="WebSeries">Web Series</option>
+          <option value="Drama">Drama</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="video" class="block text-sm font-medium text-gray-700">Video Link </label>
+        <input type="text" id="video" name="video" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required />
+      </div>
+
+      <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg">
+        Upload Video
+      </button>
+    </form>
+  </div>
+
+  <script src="/static/index.js"></script>
+</body>
+</html>

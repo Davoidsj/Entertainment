@@ -1,0 +1,103 @@
+package main
+
+import (
+	"context"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+)
+
+// Struct to map video data
+type Video struct {
+	ID          string `json:"id"`
+	Title       string `json:"title"`
+	Thumbnail   string `json:"thumbnail"`
+	Description string `json:"description"`
+	Category    string `json:"category"`
+	Video       string `json:"video"`
+}
+
+func main() {
+	// Connect to the PostgreSQL database
+	conn, err := pgx.Connect(context.Background(), "postgresql://tvdb_owner:x2MU5hLCtriZ@ep-bold-sea-a5lyd313.us-east-2.aws.neon.tech/tvdb?sslmode=require")
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v\n", err)
+	}
+	defer conn.Close(context.Background())
+
+	r := gin.Default()
+
+	// Serve static files (like index.js)
+	r.Static("/static", "./static")
+
+	// Handle POST request to upload video data
+	r.POST("/upload", func(c *gin.Context) {
+		var videoData Video
+
+		// Parse JSON request body
+		if err := c.ShouldBindJSON(&videoData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		// Generate a new UUID for the video
+		videoID := uuid.New().String()
+
+		// Insert data into PostgreSQL
+		_, err := conn.Exec(context.Background(),
+			"INSERT INTO movie_and_webseries_db (id, name, description, thumbnail, videolink, category) VALUES ($1, $2, $3, $4, $5, $6)",
+			videoID, videoData.Title, videoData.Description, videoData.Thumbnail, videoData.Video, videoData.Category)
+		if err != nil {
+			log.Printf("Database insertion failed: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert data into database"})
+			return
+		}
+
+		// Respond with success
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Video uploaded successfully!",
+			"data":    videoData,
+		})
+	})
+
+	// Handle GET request to fetch video data
+	r.GET("/videos", func(c *gin.Context) {
+		rows, err := conn.Query(context.Background(), "SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query database"})
+			return
+		}
+		defer rows.Close()
+
+		var videos []Video
+		for rows.Next() {
+			var video Video
+			err := rows.Scan(&video.ID, &video.Title, &video.Description, &video.Thumbnail, &video.Video, &video.Category)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to scan row"})
+				return
+			}
+			videos = append(videos, video)
+		}
+
+		if rows.Err() != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error iterating over rows"})
+			return
+		}
+
+		// Respond with the array of video objects
+		c.JSON(http.StatusOK, videos)
+	})
+
+	// Serve the HTML page
+	r.LoadHTMLGlob("templates/*")
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	// Start the server
+	r.Run(":8080")
+}
