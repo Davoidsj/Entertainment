@@ -101,6 +101,32 @@ func main() {
 		// Respond with the array of video objects
 		c.JSON(http.StatusOK, videos)
 	})
+ 
+	// Handle GET request to fetch a video by ID
+   r.GET("/videos/:id", func(c *gin.Context) {
+    videoID := c.Param("id") // Get the ID from the URL path
+
+    var video Video
+    err := conn.QueryRow( 
+        context.Background(),
+        "SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db WHERE id=$1",
+        videoID,
+    ).Scan(&video.ID, &video.Title, &video.Description, &video.Thumbnail, &video.Video, &video.Category)
+
+    if err != nil {
+        if err == pgx.ErrNoRows {
+            c.JSON(http.StatusNotFound, gin.H{"error": "Video not found"})
+        } else {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query database"})
+        }
+        return
+    }
+
+    // Respond with the video object
+    c.JSON(http.StatusOK, video)
+      })
+ 
+ 
 
 	// Serve the HTML page
 	r.LoadHTMLGlob("templates/*")
