@@ -23,7 +23,7 @@ type Video struct {
 
 func main() {
 	// Connect to the PostgreSQL database
-	conn, err := pgx.Connect(context.Background(), "postgresql://tvdb_owner:x2MU5hLCtriZ@ep-bold-sea-a5lyd313.us-east-2.aws.neon.tech/tvdb?sslmode=require")
+	conn, err := pgx.Connect(context.Background(), "postgresql://neondb_owner:gdilbY9FKae1@ep-royal-bonus-a5fu9rj8.us-east-2.aws.neon.tech/neondb?sslmode=require")
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
