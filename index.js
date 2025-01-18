@@ -1,0 +1,84 @@
+const express = require('express');
+const cors = require('cors');
+const { Pool } = require('pg');
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
+
+const app = express();
+const PORT = 8080;
+
+// Middleware
+app.use(cors()); // Enable CORS for all origins
+app.use(express.json()); // Parse JSON request body
+app.use('/static', express.static(path.join(__dirname, 'static'))); // Serve static files
+
+// PostgreSQL connection setup
+const pool = new Pool({
+  connectionString: 'postgresql://neondb_owner:gdilbY9FKae1@ep-royal-bonus-a5fu9rj8.us-east-2.aws.neon.tech/neondb?sslmode=require',
+});
+
+// Routes
+
+// POST: Upload video data
+app.post('/upload', async (req, res) => {
+  const { title, thumbnail, description, category, video } = req.body;
+
+  if (!title || !thumbnail || !description || !category || !video) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  const videoID = uuidv4();
+
+  try {
+    await pool.query(
+      'INSERT INTO entertainment_db (id, name, description, thumbnail, videolink, category) VALUES ($1, $2, $3, $4, $5, $6)',
+      [videoID, title, description, thumbnail, video, category]
+    );
+    res.status(200).json({ message: 'Video uploaded successfully!', data: { id: videoID, title, thumbnail, description, category, video } });
+  } catch (err) {
+    console.error('Database insertion failed:', err);
+    res.status(500).json({ error: 'Failed to insert data into database' });
+  }
+});
+
+// GET: Fetch all videos
+app.get('/videos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db');
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+});
+
+// GET: Fetch a video by ID
+app.get('/videos/:id', async (req, res) => {
+  const videoID = req.params.id;
+
+  try {
+    const result = await pool.query(
+      'SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db WHERE id = $1',
+      [videoID]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+});
+
+// Serve the HTML page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'templates', 'index.html'));
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
