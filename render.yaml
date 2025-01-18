@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: go-projects
-    env: go
-    plan: free
-    buildCommand: go build -o main .
-    startCommand: ./main
