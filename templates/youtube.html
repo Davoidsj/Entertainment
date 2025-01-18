@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Upload For Youtube</title>
+    <link rel="icon" type="image/x-icon" href="https://i.postimg.cc/Rhf4W6tz/favicon.png" />
+    <!-- DaisyUI and TailwindCSS -->
+<link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="card w-full max-w-md shadow-lg bg-white p-6 rounded-lg">
+        <h2 class="text-2xl font-bold text-center mb-4">Upload Form</h2>
+        <form id="uploadFormForYouTube" class="space-y-4">
+            <!-- Name Field -->
+            <div>
+                <label for="name" class="label">
+                    <span class="label-text">Name</span>
+                </label>
+                <input type="text" id="name" name="name" placeholder="Enter video's name" class="input input-bordered w-full" required />
+            </div>
+              <!-- Category Field -->
+              <div>
+                <label for="name" class="label">
+                    <span class="label-text">Category</span>
+                </label>
+                <input type="text" id="category" name="category" placeholder="Enter video's category" class="input input-bordered w-full" required />
+            </div
+
+            <!-- YouTube URL Field -->
+            <div>
+                <label for="youtubeurl" class="label">
+                    <span class="label-text">YouTube URL</span>
+                </label>
+                <input type="url" id="youtubeurl" name="youtubeurl" placeholder="Enter the YouTube URL" class="input input-bordered w-full" required />
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="btn btn-primary w-full">Submit</button>
+            </div>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/static/youtube.js"></script>
+</body>
+</html>

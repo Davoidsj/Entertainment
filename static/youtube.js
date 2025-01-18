@@ -1,18 +1,18 @@
-$('#uploadForm').on('submit', async event => {
+$('#uploadFormForYouTube').on('submit', async event => {
     event.preventDefault();
 
     // Get form data
     const formData = {
-        title: $('#title').val(),
-        thumbnail: $('#thumbnail').val(),
-        description: $('description').val(),
+        title: $('#name').val(),
         category: $('#category').val(),
-        video: $('#video').val()  
+        videolink: $('#youtubeurl').val()
     };
+
+ 
 
     try {
         // Send data to the server
-        const response = await axios.post('/upload', formData, {
+        const response = await axios.post('/uploadurl', formData, {
             headers: {
                 'Content-Type': 'application/json'
             }

@@ -5,7 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 
 const app = express();
-const PORT = 8080;
+const PORT = 8000;
 
 // Middleware
 app.use(cors()); // Enable CORS for all origins
@@ -74,9 +74,66 @@ app.get('/videos/:id', async (req, res) => {
 });
 
 // Serve the HTML page
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'index.html'));
 });
+
+app.get('/youtube',(_,res)=>{
+  res.sendFile(path.join(__dirname, 'templates', 'youtube.html'));
+})
+
+app.post('/uploadurl', async (req, res) => {
+  const { title, category, videolink } = req.body;
+
+  if (!title ||  !category || !videolink) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  const videoID = uuidv4();
+
+  try {
+    await pool.query(
+      'INSERT INTO youtube_db (id, name, category, youtubeurl) VALUES ($1, $2, $3, $4)',
+      [videoID, title, category,videolink]
+    );
+    res.status(200).json({ message: 'Video uploaded successfully!', data: { id: videoID, title, category, videolink } });
+  } catch (err) {
+    console.error('Database insertion failed:', err);
+    res.status(500).json({ error: 'Failed to insert data into database' });
+  }
+});
+
+app.get('/youtube-videos', async (_, res) => {
+  try {
+    const result = await pool.query('SELECT id, name, category,youtubeurl FROM youtube_db');
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+});
+
+// GET: Fetch a video by ID
+app.get('/youtube-videos/:id', async (req, res) => {
+  const videoID = req.params.id;
+
+  try {
+    const result = await pool.query(
+      'SELECT id, name, category,youtubeurl FROM youtube_db WHERE id = $1',
+      [videoID]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+});
+
 
 // Start the server
 app.listen(PORT, () => {
