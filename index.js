@@ -3,9 +3,10 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
-const PORT = 8000;
+const PORT = 7500;
 
 // Middleware
 app.use(cors()); // Enable CORS for all origins
@@ -20,26 +21,71 @@ const pool = new Pool({
 // Routes
 
 // POST: Upload video data
-app.post('/upload', async (req, res) => {
-  const { title, thumbnail, description, category, video } = req.body;
 
-  if (!title || !thumbnail || !description || !category || !video) {
-    return res.status(400).json({ error: 'All fields are required' });
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to save uploaded files
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = `${Date.now()}-${file.originalname}`;
+    cb(null, uniqueSuffix); // Save file with a unique name
+  },
+});
+const upload = multer({ storage });
+
+const ApiVideoClient = require('@api.video/nodejs-client');
+
+
+
+// Configure api.video client
+const client = new ApiVideoClient({ apiKey: 'HwDga1UgEnu0tPr62mSkwedN9mS7P7yHkFAJnGHOVaz' });
+
+app.post('/upload', upload.single('video'), async (req, res) => {
+  const { title, thumbnail, description, category } = req.body;
+
+  // Ensure required fields are provided
+  if (!title || !thumbnail || !description || !category || !req.file) {
+    return res.status(400).json({ error: 'All fields are required, including a video file.' });
   }
 
   const videoID = uuidv4();
+  const videoPath = req.file.path; // Path to the uploaded video file
 
   try {
+    // Step 1: Upload the video to api.video
+    const video = await client.videos.create({
+      title: title,
+      description: description,
+      tags: [category], // Optional: Use category as a tag
+    });
+
+    const uploadResponse = await client.videos.upload(video.videoId, videoPath);
+    const videoLink = uploadResponse.assets?.player || null;
+
+    if (!videoLink) {
+      throw new Error('Failed to retrieve video link from api.video.');
+    }
+
+    // Step 2: Insert data into the database
     await pool.query(
       'INSERT INTO entertainment_db (id, name, description, thumbnail, videolink, category) VALUES ($1, $2, $3, $4, $5, $6)',
-      [videoID, title, description, thumbnail, video, category]
+      [videoID, title, description, thumbnail, videoLink, category]
     );
-    res.status(200).json({ message: 'Video uploaded successfully!', data: { id: videoID, title, thumbnail, description, category, video } });
+
+    res.status(200).json({
+      message: 'Video uploaded successfully!',
+      data: { id: videoID, title, thumbnail, description, category, video: videoLink },
+    });
   } catch (err) {
-    console.error('Database insertion failed:', err);
-    res.status(500).json({ error: 'Failed to insert data into database' });
+    console.error('Error uploading video:', err);
+
+    res.status(500).json({ error: 'Failed to upload video or insert data into database.' });
   }
 });
+
+
 
 // GET: Fetch all videos
 app.get('/videos', async (req, res) => {
