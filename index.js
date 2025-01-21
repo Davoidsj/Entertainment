@@ -142,6 +142,31 @@ app.post(
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'index.html'));
 });
+app.get('/videos', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db');
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+})
+app.get('/videos/:id', async (req, res) => {
+  const videoID = req.params.id;
+  try {
+    const result = await pool.query(
+      'SELECT id, name, description, thumbnail, videolink, category FROM entertainment_db WHERE id = $1',
+      [videoID]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    res.status(200).json(result.rows[0]);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+});
 app.get('/youtube', (_, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'youtube.html'));
 });
