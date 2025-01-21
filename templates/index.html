@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Video</title>
   <link rel="icon" type="image/x-icon" href="https://i.postimg.cc/Rhf4W6tz/favicon.png" />
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+ 
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js" integrity="sha512-v8+bPcpk4Sj7CKB11+gK/FnsbgQ15jTwZamnBf/xDmiQDcgOIYufBo6Acu1y30vrk8gg5su4x0CG3zfPaq5Fcg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -20,7 +22,7 @@
 
       <div>
         <label for="thumbnail" class="block text-sm font-medium text-gray-700">Video Thumbnail</label>
-        <input type="text" id="thumbnail" name="thumbnail" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" required />
+        <input type="file" id="thumbnail" name="thumbnail"  class="file-input file-input-bordered file-input-secondary w-full max-w-xs" accept="image/*" required />
       </div>
 
       <div>
@@ -40,7 +42,7 @@
 
       <div>
         <label for="video" class="block text-sm font-medium text-gray-700">Upload Video</label>
-        <input type="file" id="video" name="video" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg" accept="video/*" required />
+        <input type="file" id="video" name="video" class="file-input file-input-bordered file-input-primary w-full max-w-xs" accept="video/*" required />
       </div>
 
       <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg">

@@ -3,7 +3,7 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
-    "@api.video/nodejs-client": "^2.6.8",
+    "axios": "^1.7.9",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",
