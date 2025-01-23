@@ -170,6 +170,15 @@ app.get('/videos/:id', async (req, res) => {
 app.get('/youtube', (_, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'youtube.html'));
 });
+app.get('/youtube-videos', async (_, res) => {
+  try {
+    const result = await pool.query('SELECT id, name, category,youtubeurl FROM youtube_db');
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('Failed to query database:', err);
+    res.status(500).json({ error: 'Failed to query database' });
+  }
+});
 app.get('/youtube-videos/:id', async (req, res) => {
   const videoID = req.params.id;
   try {
