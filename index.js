@@ -170,6 +170,23 @@ app.get('/videos/:id', async (req, res) => {
 app.get('/youtube', (_, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'youtube.html'));
 });
+app.post('/uploadurl', async (req, res) => {
+  const { title, category, videolink } = req.body;
+  if (!title ||  !category || !videolink) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+  const videoID = uuidv4();
+  try {
+    await pool.query(
+      'INSERT INTO youtube_db (id, name, category, youtubeurl) VALUES ($1, $2, $3, $4)',
+      [videoID, title, category,videolink]
+    );
+    res.status(200).json({ message: 'Video uploaded successfully!', data: { id: videoID, title, category, videolink } });
+  } catch (err) {
+    console.error('Database insertion failed:', err);
+    res.status(500).json({ error: 'Failed to insert data into database' });
+  }
+});
 app.get('/youtube-videos', async (_, res) => {
   try {
     const result = await pool.query('SELECT id, name, category,youtubeurl FROM youtube_db');
