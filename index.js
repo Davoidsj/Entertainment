@@ -234,6 +234,7 @@ app.get("/notification", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
+
 app.get("/notification", async (req, res) => {
   try {
     // Fetch the latest three videos from youtube_db
@@ -256,6 +257,7 @@ app.get("/notification", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
+
 
 
 // Start the server
