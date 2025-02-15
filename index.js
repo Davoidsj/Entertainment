@@ -251,12 +251,13 @@ app.get("/notification", async (req, res) => {
       (video) => `Watch ${video.name} (${video.category})`
     );
 
-    res.status(200).json({ message: recommendations });
+    res.status(200).json({ message: recommendations }); 
   } catch (err) {
     console.error("Error fetching notifications:", err);
     res.status(500).json({ error: "Failed to fetch notifications" });
   }
 });
+
 
 
 
