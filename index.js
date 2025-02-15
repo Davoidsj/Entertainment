@@ -217,7 +217,7 @@ app.get("/notification", async (req, res) => {
   try {
     // Fetch the latest three videos from youtube_db
     const result = await pool.query(
-      "SELECT name, category FROM youtube_db ORDER BY id DESC LIMIT 3"
+      "SELECT id, name, category FROM youtube_db ORDER BY created_at DESC LIMIT 5"
     );
 
     if (result.rows.length === 0) {
