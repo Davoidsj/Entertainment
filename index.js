@@ -212,28 +212,6 @@ app.get('/youtube-videos/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to query database' });
   }
 });
-app.get("/notification", async (req, res) => {
-  try {
-    // Fetch the latest three videos from youtube_db
-    const result = await pool.query(
-      "SELECT name, category FROM youtube_db ORDER BY id DESC LIMIT 3"
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No recent videos found." });
-    }
-
-    // Generate message based on categories
-    const recommendations = result.rows.map(
-      (video) => `Watch ${video.name} (${video.category})`
-    );
-
-    res.status(200).json({ message: recommendations.join(" | ") });
-  } catch (err) {
-    console.error("Error fetching notifications:", err);
-    res.status(500).json({ error: "Failed to fetch notifications" });
-  }
-});
 
 app.get("/notification", async (req, res) => {
   try {
